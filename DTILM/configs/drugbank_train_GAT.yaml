@@ -1,0 +1,30 @@
+# if using GAT, change GAT, module, datamodule, best_param_name
+defaults:
+  - _self_
+  - module: GAT.yaml
+  - datamodule: drugbank_GAT.yaml
+  - callbacks: default.yaml
+  - preprocess: drugbank.yaml
+  - featurizer: default.yaml
+  - tuning: default_GAT.yaml
+  - GAT: default.yaml
+
+trainer:
+  max_epochs: 200
+
+logger:
+  name: 'drugbank'
+
+variant_pred:
+  pred: True
+  dir: "/data/istiaq/work/projects/dti/dtilm2/datasets/variant/drugbank_id_2_vars.pkl"
+  train: "default"
+  test: "default"
+
+best_param_path: './configs/best_params/'
+best_param_name: 'cold_drug_balanced_GAT.yaml'
+
+multiprocessing:
+  multiprocessing: False
+  num_process: 10
+  concurrent_process: 10

@@ -1,0 +1,253 @@
+GAT: {}
+best_param_name: random_balanced_GAT.yaml
+best_param_path: ./configs/best_params/
+callbacks:
+  early_stopping:
+    _target_: pytorch_lightning.callbacks.EarlyStopping
+    check_finite: true
+    check_on_train_epoch_end: null
+    divergence_threshold: null
+    min_delta: 5.0e-05
+    mode: max
+    monitor: val_auc
+    patience: 30
+    stopping_threshold: null
+    strict: true
+    verbose: false
+  model_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    auto_insert_metric_name: true
+    dirpath: null
+    every_n_epochs: 1
+    every_n_train_steps: null
+    filename: checkpoint_{epoch:03d}-{val_loss:.4f}-{val_auc:.4f}
+    mode: max
+    monitor: val_auc
+    save_last: true
+    save_on_train_epoch_end: null
+    save_top_k: 5
+    save_weights_only: false
+    train_time_interval: null
+    verbose: false
+datamodule:
+  _target_: datamodule.dataloader_GAT2.UNIDataModule
+  dm_cfg:
+    batch_size: 128
+    num_workers: 4
+  serializer:
+    drug_name: 11bindingDB_${preprocess.label}_PubChem10M.pt
+    load_serialized: true
+    save_path: ./datasets/serialized_new/
+    target_name: 11bindingDB_${preprocess.label}_ESM.pt
+  splitting:
+    balanced: true
+    ratio:
+    - 0.79
+    - 0.01
+    - 0.2
+    seed: 42
+    splitting_strategy: random
+    unbalanced_ratio: 10
+featurizer:
+  drugfeaturizer:
+    _target_: module.featurizer.drug_featurizer.chembert_featurizer.CHEMFEATURE
+  protfeaturizer:
+    _target_: module.featurizer.prot_featurizer.esm_featurizer.ESMFEATURE
+logger:
+  name: bindingDB
+module:
+  GAT_params:
+    concat:
+      alpha: 10
+      concat: false
+    drug_gat:
+      add_self_loops: false
+      dropout: 0.3
+      heads: 8
+      num_layers: 4
+      out_channels: 96
+      threshold: 5
+    prot_gat:
+      add_self_loops: true
+      dropout: 0.2
+      heads: 8
+      num_layers: 2
+      out_channels: 160
+      threshold: 2
+  _target_: module.GAT.Net
+  criterion:
+    _target_: torch.nn.BCEWithLogitsLoss
+  network:
+    activation_fn: ReLU
+    dropout: 0.2
+    drug_dim: 768
+    layers:
+    - 512
+    - 256
+    output_dim: 1
+    prot_dim: 1280
+  optimizer:
+    lr: 0.00024614317367271417
+    optimizer: Adam
+    weight_decay: 0.0006755020499865177
+multiprocessing:
+  concurrent_process: 10
+  multiprocessing: false
+  num_process: 10
+preprocess:
+  binary: true
+  convert_to_log: true
+  data_path: ./datasets/bindingDB/
+  label: Kd
+  name: bindingDB
+  threshold:
+  - 800
+  - 1000
+trainer:
+  max_epochs: 200
+tuning:
+  param_search:
+    search_space:
+      activation_fn:
+        _target_: ray.tune.choice
+        categories:
+        - ReLU
+      alpha:
+        _target_: ray.tune.choice
+        categories:
+        - 0.1
+        - 1
+        - 5
+        - 10
+        - 100
+      batch_size:
+        _target_: ray.tune.choice
+        categories:
+        - 128
+        - 256
+        - 512
+        - 768
+        - 1024
+        - 1280
+      dropout:
+        _target_: ray.tune.choice
+        categories:
+        - 0.2
+      drug_gat:
+        add_self_loops:
+          _target_: ray.tune.choice
+          categories:
+          - true
+          - false
+        dropout:
+          _target_: ray.tune.choice
+          categories:
+          - 0.1
+          - 0.2
+          - 0.3
+        heads:
+          _target_: ray.tune.choice
+          categories:
+          - 2
+          - 4
+          - 8
+        num_layers:
+          _target_: ray.tune.choice
+          categories:
+          - 1
+          - 2
+          - 3
+          - 4
+        out_channels:
+          _target_: ray.tune.choice
+          categories:
+          - 64
+          - 128
+          - 256
+          - 512
+      drug_threshold:
+        _target_: ray.tune.loguniform
+        lower: 0.01
+        upper: 7
+      layers:
+        _target_: ray.tune.choice
+        categories:
+        - - 512
+          - 256
+        - - 256
+          - 128
+        - - 1024
+          - 512
+          - 256
+        - - 512
+          - 256
+          - 128
+        - - 256
+          - 128
+          - 64
+        - - 1024
+          - 512
+          - 256
+          - 128
+        - - 512
+          - 256
+          - 128
+          - 64
+        - - 256
+          - 128
+          - 64
+          - 32
+        - - 2048
+          - 1024
+          - 256
+          - 128
+      lr:
+        _target_: ray.tune.loguniform
+        lower: 1.0e-05
+        upper: 0.01
+      optimizer:
+        _target_: ray.tune.choice
+        categories:
+        - Adam
+      prot_gat:
+        add_self_loops:
+          _target_: ray.tune.choice
+          categories:
+          - true
+          - false
+        dropout:
+          _target_: ray.tune.choice
+          categories:
+          - 0.1
+          - 0.2
+          - 0.3
+        heads:
+          _target_: ray.tune.choice
+          categories:
+          - 2
+          - 4
+          - 8
+        num_layers:
+          _target_: ray.tune.choice
+          categories:
+          - 1
+          - 2
+          - 3
+          - 4
+        out_channels:
+          _target_: ray.tune.choice
+          categories:
+          - 64
+          - 128
+          - 256
+          - 512
+      prot_threshold:
+        _target_: ray.tune.loguniform
+        lower: 0.01
+        upper: 5
+    tune: false
+variant_pred:
+  dir: /data/istiaq/work/projects/dti/dtilm2/datasets/variant/binding_id_2_vars.pkl
+  pred: false
+  test: default
+  train: default

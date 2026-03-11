@@ -1,0 +1,36 @@
+# if using GAT, change GAT, module, datamodule, best_param_name
+defaults:
+  - _self_
+  - preprocess: bindingDB.yaml
+  - module: GAT.yaml
+  - datamodule: bindingDB_GAT.yaml
+  - callbacks: default.yaml
+  - featurizer: default.yaml
+  - tuning: default_GAT.yaml
+  - GAT: default.yaml
+
+trainer:
+  max_epochs: 200
+
+logger:
+  name: 'bindingDB'
+
+variant_pred:
+  pred: False
+  dir: "/data/istiaq/work/projects/dti/dtilm2/datasets/variant/binding_id_2_vars.pkl"
+  train: "default"
+  test: "default"
+
+best_param_path: './configs/best_params/'
+best_param_name: 'random_balanced_GAT.yaml'
+
+multiprocessing:
+  multiprocessing: False
+  num_process: 10
+  concurrent_process: 10
+
+
+
+
+
+
