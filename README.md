@@ -45,7 +45,7 @@ The project investigates how post-transcriptional regulation, especially alterna
 This work uses two public datasets:
 
 - **DrugBank** for binary drug–target interaction labels
-- **BindingDB** for experimentally measured binding affinities, converted to binary interaction labels using a threshold on Kd values. Both datasets have been prepared for the experiments described in the manuscript. They are 
+- **BindingDB** for experimentally measured binding affinities, converted to binary interaction labels using a threshold on Kd values. Both datasets have been prepared for the experiments described in the manuscript. 
 - Train data with representative isoforms 
 - Train data with variant isoforms 
 - Test data with representative isoforms
@@ -53,7 +53,7 @@ This work uses two public datasets:
 
 Both datasets are provided in proper format for DTILM ([link](https://drive.google.com/drive/folders/1A5fvXrYfcOYhBNVXhZLuT_4V_iZOqt5k?usp=drive_link)) and Moltrans ([link](https://drive.google.com/drive/folders/1Kk-s9rkWcl_pLrgLSd_JpTu8Z_Ir5K6I?usp=drive_link)). 
 
-Protein isoform sequences are collected from **Ensembl** and **GENCODE** are also proivded [here](https://drive.google.com/drive/folders/1Un7IImRgb--_8X40aHA7VUu-sEUK29Dk?usp=drive_link)
+Protein isoform sequences are collected from **Ensembl** and **GENCODE** are also provided [here](https://drive.google.com/drive/folders/1Un7IImRgb--_8X40aHA7VUu-sEUK29Dk?usp=drive_link)
 
 
 ## Experiments included
@@ -89,7 +89,7 @@ Representative isoforms (**Rep. iso**) and variant isoforms (**Var. iso**) are u
 **Table:** DTI prediction performance of DTI-LM and MolTrans on the BindingDB dataset.  
 Representative isoforms (**Rep. iso**) and variant isoforms (**Var. iso**) are used in different combinations for training and testing. Metrics reported include True Negative (TN), False Positive (FP), False Negative (FN), True Positive (TP), F1 score, and AUC.
 
-To run it using **DTILM** follow the instructions below. Copy the datasets from the provided links and put it in the corresponding folders before running the model.
+To run it using **DTILM**, follow the instructions below. Copy the datasets from the provided links and put it in the corresponding folders before running the model.
 
 ```cd DTILM```
 
@@ -107,17 +107,17 @@ To run it using **Moltrans** follow the instructions below
 
 ```cd MolTrans```
 
-in the *run_variant.py* file edit the *dataset*, *train_type* and *test_type* variable for desired dataset and run 
+In the *run_variant.py* file edit the *dataset*, *train_type* and *test_type* variable for desired dataset and run 
 
 ```python run_variant.py```
 
 ### 2. Structural analysis of matched and mismatched predictions
-Depending on prediction made by **DTILM** or **Moltrans** Protein–ligand pairs are grouped into:
+Depending on the prediction made by **DTILM** or **Moltrans** Protein–ligand pairs are grouped into:
 - **Matched pairs**: same prediction for representative and variant isoforms
 - **Mismatched pairs**: different predictions for representative and variant isoforms
-Run **DTILM** with *default* train twice, test with *default* and *furthest*. The test logs will be saved in *3d_analysis* folder. Run the *analysis.ipynb* to get the results on 3D analysis and sequence similarity experiments. 
+Run **DTILM** twice. Both times with *default* train but test with *default* and *furthest*. The test logs will be saved in *3d_analysis* folder. Run the *analysis.ipynb* to get the results on 3D analysis and sequence similarity experiments. 
 
-Their predicted 3D complexes are compared to examine whether prediction consistency is associated with preservation of binding-site geometry. Use [AlphaFold3](https://github.com/google-deepmind/alphafold3) ro [DiffDock](https://github.com/gcorso/DiffDock) to generate the 3D complexes for Protein-Ligand pairs and provide the path to the complexes for each pair in the code. Follow instructions provided in their respective repositories to generate 3D complexes. 
+Their predicted 3D complexes are compared to examine whether prediction consistency is associated with preservation of binding-site geometry. Use [AlphaFold3](https://github.com/google-deepmind/alphafold3) or [DiffDock](https://github.com/gcorso/DiffDock) to generate the 3D complexes for Protein-Ligand pairs and provide the path to the complexes for each pair in the code. Follow instructions provided in their respective repositories to generate 3D complexes. 
 ## Structural Comparison – Matched Prediction Pairs
 
 <p align="center">
@@ -143,7 +143,7 @@ Their predicted 3D complexes are compared to examine whether prediction consiste
 Protein sequences are modified by gradually deleting residues from predicted binding-site regions. This evaluates how strongly DTI models depend on localized interaction-relevant residues.
 
 For **DTILM** 
-Modify *DTILM/datamodule/dataloader_GAT2.py* between lines 33 and 38. Uncomment the line for your desired experiment and set the value of *percent* value with desired percentage you want to delete. 
+Modify *DTILM/datamodule/dataloader_GAT2.py* between lines 33 and 38. Uncomment the line for your desired experiment and set the value of *percent* with desired percentage you want to delete. 
 - seq = get_modified_seq(seq,smile)  -> for deleting binding site based on DiffDock generated complexes
 - seq = get_modified_seq_alpha(seq,smile) -> for deleting binding site based on AlphaFold3 generated complexes
 - seq = get_3_prime(seq) -> for deleting protein from C-Terminal
@@ -153,12 +153,12 @@ Modify *Moltrans/stream.py* between lines 98 and 105. Uncomment the line for you
 
 
 ### 5. Affinity prediction under sequence perturbation
-[AttentionDTA](https://github.com/zhaoqichang/AttentionDTA_TCBB/) is used to measure how protein sequence deletion affects predicted binding affinity. The experiment is run with progressive deletion of binding-site or protein from C-Terminal. The choice can be modified at *AttentionDTA/dataset.py* line 61-63 with same functinality as DTILM and Moltrans. To run it , 
+[AttentionDTA](https://github.com/zhaoqichang/AttentionDTA_TCBB/) is used to measure how protein sequence deletion affects predicted binding affinity. The experiment is performed with progressive deletion of the binding site or protein residues from the C-terminal. The choice can be modified at *AttentionDTA/dataset.py* line 61-63 with same functinality as DTILM and Moltrans. To run it , 
 ```cd AttentionDTA```
 ```python train.py```
 
-This will run the model for 0 to 100 deletion of binding-site. When deleting from C-terminal, use 10-90 deletion. This applies for DTILM and Moltrans as well. 
+This will run the model for 0 to 100% deletion of binding-site. When deleting from C-terminal, use 10-90 deletion. This applies for DTILM and Moltrans as well. 
 
 ## Installation
 
-To run each method please the corresponding repository for setting up the conda environment and software requirements. 
+To run each method, please follow the setup instructions in the corresponding repository for the required conda environments and dependencies.
